@@ -1,24 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
+import { startDrawing, draw } from "../hooks/Drawing";
+import { startDrag, handleDrag, cropAction } from "../hooks/Crop";
 
-export default function Canvas() {
+
+export default function Canvas({ canvasRef, active, setActive,
+                                 cropRatio, setCropRatio, pencilColor, setPencilColor, textColor, setTextColor }) {
   const canvasContainerRef = useRef(null);
-  const canvasRef = useRef(null);
   const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
-  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const context = canvas.getContext('2d');
 
     const handleResize = () => {
-      // 저장된 크기 업데이트
-      setCanvasSize({
-        width: canvasContainerRef.current.offsetWidth,
-        height: canvasContainerRef.current.offsetHeight
-      });
-
       // Canvas 크기 설정
       canvas.width = canvasContainerRef.current.offsetWidth;
       canvas.height = canvasContainerRef.current.offsetHeight;
@@ -37,10 +35,28 @@ export default function Canvas() {
   }, [window.innerWidth, window.innerHeight]);
 
 
+  const handleMouse = (e, props) => {
+    if (active === 'pencil') {
+      if (props === 'down') startDrawing(e, canvasRef, pencilColor, setIsDrawing);
+      else if (props === 'move') draw(e, canvasRef, pencilColor, isDrawing);
+      else setIsDrawing(false);
+    } else if (active === 'crop') {
+      if (props === 'down') startDrag(e, setIsDragging, setStartPosition, canvasRef);
+      else if (props === 'move') handleDrag(e, canvasRef, isDragging, startPosition, cropRatio);
+      else if (props === 'up') {
+        cropAction(e, canvasRef, isDragging, setIsDragging, startPosition);
+        setActive('cursor');
+      }
+    }
+  }
+
+
   return (
     <Wrapper size={size}>
       <CanvasContainer ref={canvasContainerRef}>
-        <canvas id="canvas" ref={canvasRef}></canvas>
+        <canvas id="canvas" ref={canvasRef}
+          onMouseDown={(e) => handleMouse(e, 'down')} onMouseMove={(e) => handleMouse(e, 'move')}
+          onMouseUp={(e) => handleMouse(e, 'up')} onMouseOut={(e) => handleMouse(e, 'out')} />
       </CanvasContainer>
     </Wrapper>
   );
