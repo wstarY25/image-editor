@@ -6,23 +6,22 @@ import Canvas from "./components/Canvas";
 
 export default function Main() {
   const canvasRef = useRef(null);
-  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const [active, setActive] = useState('cursor');
-  const [cropRatio, setCropRatio] = useState('');
+  const [cropRatio, setCropRatio] = useState(0);
   const [pencilColor, setPencilColor] = useState('black');
   const [textColor, setTextColor] = useState('black');
 
   return (
     <Body>
       <Top>
-        <TopBar canvasRef={canvasRef} canvasSize={canvasSize} setCanvasSize={setCanvasSize}
+        <TopBar canvasRef={canvasRef}
           active={active} setActive={setActive}
           cropRatio={cropRatio} setCropRatio={setCropRatio}
           pencilColor={pencilColor} setPencilColor={setPencilColor}
           textColor={textColor} setTextColor={setTextColor} />
       </Top>
       <CanvasContainer>
-        <Canvas canvasRef={canvasRef} canvasSize={canvasSize} setCanvasSize={setCanvasSize}
+        <Canvas canvasRef={canvasRef}
           active={active} setActive={setActive}
           cropRatio={cropRatio} setCropRatio={setCropRatio}
           pencilColor={pencilColor} setPencilColor={setPencilColor}
