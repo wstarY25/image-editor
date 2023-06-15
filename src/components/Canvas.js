@@ -44,7 +44,7 @@ export default function Canvas({ canvasRef, active, setActive,
       if (props === 'down') startDrag(e, setIsDragging, setStartPosition, canvasRef);
       else if (props === 'move') handleDrag(e, canvasRef, isDragging, startPosition, cropRatio);
       else if (props === 'up') {
-        cropAction(e, canvasRef, isDragging, setIsDragging, startPosition);
+        cropAction(e, canvasRef, isDragging, setIsDragging, startPosition, cropRatio);
         setActive('cursor');
       }
     }
