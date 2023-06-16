@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import styled from "styled-components";
-import TopBar from "./components/TopBar";
-import Canvas from "./components/Canvas";
+import TopBar from "./TopBar";
+import Canvas from "./Canvas";
 
 
 export default function Main() {

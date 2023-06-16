@@ -54,8 +54,6 @@ export default function TopBar({ canvasRef, canvasHistory, setCanvasHistory, cur
     }
   }
 
-  console.log(canvasHistory.length, currentStateIndex);
-
 
   return (
     <Wrapper>
