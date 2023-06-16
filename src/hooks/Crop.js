@@ -1,5 +1,3 @@
-// 이미지 자르기
-
 const startDrag = (event, setIsDragging, setStartPosition, canvasRef) => {
   setIsDragging(true);
   const { offsetX, offsetY } = event.nativeEvent;

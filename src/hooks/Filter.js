@@ -1,5 +1,3 @@
-// 이미지 필터
-
 export const filter = (canvasRef, effect) => {
   const canvas = canvasRef.current;
   const context = canvas.getContext('2d');
