@@ -1,5 +1,3 @@
-// 그림 그리기
-
 const startDrawing = (event, canvasRef, pencilColor, setIsDrawing) => {
   setIsDrawing(true);
   const canvas = canvasRef.current;

@@ -1,5 +1,3 @@
-// 이미지 저장
-
 export const saveFile = (canvasRef) => {
   const canvas = canvasRef.current;
 

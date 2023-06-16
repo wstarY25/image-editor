@@ -1,18 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
+import { saveHistory } from "../hooks/SaveHistory";
 import { startDrawing, draw } from "../hooks/Drawing";
 import { startDrag, handleDrag, cropAction } from "../hooks/Crop";
+import { textbox } from "../hooks/Textbox";
 
 
-export default function Canvas({ canvasRef, active, setActive,
-                                 cropRatio, setCropRatio, pencilColor, setPencilColor, textColor, setTextColor }) {
+export default function Canvas({ canvasRef, canvasHistory, setCanvasHistory, currentStateIndex, setCurrentStateIndex, active, setActive,
+                                 cropRatio, setCropRatio, pencilColor, setPencilColor, textColor, setTextColor, textRef }) {
   const canvasContainerRef = useRef(null);
   const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
-
+  
   useEffect(() => {
     const canvas = canvasRef.current;
 
@@ -39,14 +41,21 @@ export default function Canvas({ canvasRef, active, setActive,
     if (active === 'pencil') {
       if (props === 'down') startDrawing(e, canvasRef, pencilColor, setIsDrawing);
       else if (props === 'move') draw(e, canvasRef, pencilColor, isDrawing);
-      else setIsDrawing(false);
+      else if (isDrawing) {
+        setIsDrawing(false);
+        saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
+      }
     } else if (active === 'crop') {
       if (props === 'down') startDrag(e, setIsDragging, setStartPosition, canvasRef);
       else if (props === 'move') handleDrag(e, canvasRef, isDragging, startPosition, cropRatio);
       else if (props === 'up') {
         cropAction(e, canvasRef, isDragging, setIsDragging, startPosition, cropRatio);
+        saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
         setActive('cursor');
       }
+    } if (active === 'text' && props === 'down') {
+      textbox(e, canvasRef, textColor, textRef);
+      saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
     }
   }
 

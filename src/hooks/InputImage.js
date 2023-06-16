@@ -1,5 +1,3 @@
-// 이미지 가져오기
-
 export const inputImage = (event, canvasRef) => {
   const file = event.target.files[0];
   const reader = new FileReader();

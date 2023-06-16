@@ -1,5 +1,3 @@
-// 회전
-
 export const rotation = (canvasRef, angle) => {
   const repeat = Math.abs(angle) / 90;
   if (angle > 0) angle = 90;
