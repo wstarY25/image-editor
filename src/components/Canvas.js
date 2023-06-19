@@ -7,8 +7,8 @@ import { startDrag, handleDrag, cropAction } from "../hooks/Crop";
 import { textbox } from "../hooks/Textbox";
 
 
-export default function Canvas({ canvasRef, canvasHistory, setCanvasHistory, currentStateIndex, setCurrentStateIndex, active, setActive,
-                                 cropRatio, setCropRatio, pencilColor, setPencilColor, textColor, setTextColor, textRef }) {
+export default function Canvas({ canvasRef, canvasSize, setCanvasSize, canvasHistory, setCanvasHistory, currentStateIndex, setCurrentStateIndex,
+                                 active, setActive, cropRatio, setCropRatio, pencilColor, setPencilColor, textContent, setTextContent, textColor, setTextColor }) {
   const canvasContainerRef = useRef(null);
   const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
   const [isDrawing, setIsDrawing] = useState(false);
@@ -26,6 +26,9 @@ export default function Canvas({ canvasRef, canvasHistory, setCanvasHistory, cur
 
     // 초기 사이즈 설정
     handleResize();
+
+    // history 시작
+    saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
 
     // 리사이즈 이벤트 처리
     window.addEventListener('resize', handleResize);
@@ -54,7 +57,7 @@ export default function Canvas({ canvasRef, canvasHistory, setCanvasHistory, cur
         setActive('cursor');
       }
     } if (active === 'text' && props === 'down') {
-      textbox(e, canvasRef, textColor, textRef);
+      textbox(e, canvasRef, textColor, textContent);
       saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
     }
   }

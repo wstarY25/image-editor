@@ -1,38 +1,39 @@
 import { useRef, useState } from "react";
 import styled from "styled-components";
-import TopBar from "./components/TopBar";
-import Canvas from "./components/Canvas";
+import TopBar from "./TopBar";
+import Canvas from "./Canvas";
 
 
 export default function Main() {
   const canvasRef = useRef(null);
+  const [canvasSize, setCanvasSize] = useState({width: 0, height: 0});
   const [canvasHistory, setCanvasHistory] = useState([]);
-  const [currentStateIndex, setCurrentStateIndex] = useState(0);
+  const [currentStateIndex, setCurrentStateIndex] = useState(-1);
   const [active, setActive] = useState('cursor');
   const [cropRatio, setCropRatio] = useState(0);
   const [pencilColor, setPencilColor] = useState('black');
+  const [textContent, setTextContent] = useState('');
   const [textColor, setTextColor] = useState('black');
-  const textRef = useRef('');
 
   return (
     <Body>
       <Top>
-        <TopBar canvasRef={canvasRef}
+        <TopBar canvasRef={canvasRef} canvasSize={canvasSize} setCanvasSize={setCanvasSize}
           canvasHistory={canvasHistory} setCanvasHistory={setCanvasHistory}
           currentStateIndex={currentStateIndex} setCurrentStateIndex={setCurrentStateIndex}
           active={active} setActive={setActive}
           cropRatio={cropRatio} setCropRatio={setCropRatio}
           pencilColor={pencilColor} setPencilColor={setPencilColor}
-          textColor={textColor} setTextColor={setTextColor} textRef={textRef} />
+          textContent={textContent} setTextContent={setTextContent} textColor={textColor} setTextColor={setTextColor} />
       </Top>
       <CanvasContainer>
-        <Canvas canvasRef={canvasRef}
+        <Canvas canvasRef={canvasRef} canvasSize={canvasSize} setCanvasSize={setCanvasSize}
           canvasHistory={canvasHistory} setCanvasHistory={setCanvasHistory}
           currentStateIndex={currentStateIndex} setCurrentStateIndex={setCurrentStateIndex}
           active={active} setActive={setActive}
           cropRatio={cropRatio} setCropRatio={setCropRatio}
           pencilColor={pencilColor} setPencilColor={setPencilColor}
-          textColor={textColor} setTextColor={setTextColor} textRef={textRef} />
+          textContent={textContent} setTextContent={setTextContent} textColor={textColor} setTextColor={setTextColor} />
         <Name>© 모바일앱개발협동조합</Name>
       </CanvasContainer>
     </Body>

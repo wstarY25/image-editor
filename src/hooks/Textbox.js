@@ -1,4 +1,4 @@
-export const textbox = (event, canvasRef, textColor, textRef) => {
+export const textbox = (event, canvasRef, textColor, textContent) => {
   const canvas = canvasRef.current;
   const context = canvas.getContext('2d');
 
@@ -9,5 +9,5 @@ export const textbox = (event, canvasRef, textColor, textRef) => {
 
   context.font = '20px Arial';
   context.fillStyle = textColor;
-  context.fillText(textRef.current.value, offsetX, offsetY);
+  context.fillText(textContent, offsetX, offsetY);
 }

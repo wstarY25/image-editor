@@ -22,11 +22,12 @@ import { filter } from "../hooks/Filter";
 import { undo, redo } from "../hooks/UndoRedo";
 
 
-export default function TopBar({ canvasRef, canvasHistory, setCanvasHistory, currentStateIndex, setCurrentStateIndex, active, setActive,
-                                 cropRatio, setCropRatio, pencilColor, setPencilColor, textColor, setTextColor, textRef }) {
-  const [detailTopBar, setDetailTopBar] = useState('cursor');
+export default function TopBar({ canvasRef, canvasSize, setCanvasSize, canvasHistory, setCanvasHistory, currentStateIndex, setCurrentStateIndex,
+                                 active, setActive, cropRatio, setCropRatio, pencilColor, setPencilColor, textContent, setTextContent, textColor, setTextColor }) {
+    const [detailTopBar, setDetailTopBar] = useState('cursor');
 
   const handleClick = (props) => {
+    if (props !== 'text' && textContent) setTextContent('');
     setActive(props);
     if (detailTopBar === props) setDetailTopBar('cursor');
     else setDetailTopBar(props);
@@ -53,8 +54,6 @@ export default function TopBar({ canvasRef, canvasHistory, setCanvasHistory, cur
       redo(canvasRef, canvasHistory, currentStateIndex, setCurrentStateIndex);
     }
   }
-
-  console.log(canvasHistory.length, currentStateIndex);
 
 
   return (
@@ -96,7 +95,10 @@ export default function TopBar({ canvasRef, canvasHistory, setCanvasHistory, cur
         <TextIcon fill={active === 'text' ? 'black' : '#777777'}  onClick={() => handleClick('text')} />
         { detailTopBar === 'text' && 
         <DetailBar>
-          <Detail><input ref={textRef} type="text" id="text" name="text" maxLength="20" placeholder="텍스트를 입력하세요" /></Detail>
+          <Detail>
+            <input type="text" id="text" name="text" maxLength="20" placeholder="텍스트를 입력하세요"
+              value={textContent} onChange={(e) => setTextContent(e.target.value)} />
+          </Detail>
           <TextColorPicker><ChromePicker color={textColor} onChange={(color) => setTextColor(color.hex)} /></TextColorPicker>
         </DetailBar> }
         <PencilIcon fill={active === 'pencil' ? 'black' : '#777777'}  onClick={() => handleClick('pencil')} />
@@ -104,8 +106,12 @@ export default function TopBar({ canvasRef, canvasHistory, setCanvasHistory, cur
         <PencilColorPicker><ChromePicker color={pencilColor} onChange={(color) => setPencilColor(color.hex)} /></PencilColorPicker> }
       </Center>
       <Right>
-        <UndoIcon onClick={() => handleUndoRedo('undo')} />
-        <RedoIcon onClick={() => handleUndoRedo('redo')} />
+        { currentStateIndex > 0 ?
+          <UndoIcon onClick={() => handleUndoRedo('undo')} />
+        : <UndoIcon fill="#DDDDDD" /> }
+        { currentStateIndex < canvasHistory.length - 1 ?
+          <RedoIcon onClick={() => handleUndoRedo('redo')} />
+        : <RedoIcon fill="#DDDDDD" /> }
       </Right>
     </Wrapper>
   );
