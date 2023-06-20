@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
+import { moveStart, move, moveEnd } from "../hooks/Move";
+import { zoomIn, zoomOut } from "../hooks/Zoom";
 import { saveHistory } from "../hooks/SaveHistory";
 import { startDrawing, draw } from "../hooks/Drawing";
 import { startDrag, handleDrag, cropAction } from "../hooks/Crop";
 import { textbox } from "../hooks/Textbox";
 
 
-export default function Canvas({ canvasRef, canvasSize, setCanvasSize, canvasHistory, setCanvasHistory, currentStateIndex, setCurrentStateIndex,
+export default function Canvas({ canvasRef, canvasScale, setCanvasScale, canvasHistory, setCanvasHistory, currentStateIndex, setCurrentStateIndex,
                                  active, setActive, cropRatio, setCropRatio, pencilColor, setPencilColor, textContent, setTextContent, textColor, setTextColor }) {
   const canvasContainerRef = useRef(null);
-  const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+  const [isMoving, setIsMoving] = useState(false);
+  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0});
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
@@ -18,27 +21,24 @@ export default function Canvas({ canvasRef, canvasSize, setCanvasSize, canvasHis
   useEffect(() => {
     const canvas = canvasRef.current;
 
-    const handleResize = () => {
-      // Canvas 크기 설정
-      canvas.width = canvasContainerRef.current.offsetWidth;
-      canvas.height = canvasContainerRef.current.offsetHeight;
-    };
+    // canvas 초기 사이즈 설정
+    canvas.width = canvasContainerRef.current.offsetWidth - 50;
+    canvas.height = canvasContainerRef.current.offsetHeight - 50;
 
-    // 초기 사이즈 설정
-    handleResize();
+    // canvas 초기 위치 설정
+    canvas.style.transform = 'translate(25px, 25px)';
 
-    // history 시작
+    // 첫 history 저장
     saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
-
-    // 리사이즈 이벤트 처리
-    window.addEventListener('resize', handleResize);
-    return () => { window.removeEventListener('resize', handleResize); };
   }, []);
 
-  useEffect(() => {
-    setSize({ width: window.innerWidth, height: window.innerHeight });
-  }, [window.innerWidth, window.innerHeight]);
-
+  const handleMove = (e, props) => {
+    if (active === 'cursor') {
+      if (props === 'down') moveStart(e, canvasRef, setIsMoving, setMouseOffset, canvasScale);
+      else if (props === 'move') move(e, canvasRef, isMoving, mouseOffset, canvasScale);
+      else if (props === 'up') moveEnd(setIsMoving);
+    }
+  }
 
   const handleMouse = (e, props) => {
     if (active === 'pencil') {
@@ -64,35 +64,52 @@ export default function Canvas({ canvasRef, canvasSize, setCanvasSize, canvasHis
 
 
   return (
-    <Wrapper size={size}>
-      <CanvasContainer ref={canvasContainerRef}>
-        <canvas id="canvas" ref={canvasRef}
-          onMouseDown={(e) => handleMouse(e, 'down')} onMouseMove={(e) => handleMouse(e, 'move')}
-          onMouseUp={(e) => handleMouse(e, 'up')} onMouseOut={(e) => handleMouse(e, 'out')} />
-      </CanvasContainer>
+    <Wrapper ref={canvasContainerRef}
+      onMouseDown={(e) => handleMove(e, 'down')} onMouseMove={(e) => handleMove(e, 'move')} onMouseUp={(e) => handleMove(e, 'up')}>
+      <canvas id="canvas" ref={canvasRef}
+        onMouseDown={(e) => handleMouse(e, 'down')} onMouseMove={(e) => handleMouse(e, 'move')}
+        onMouseUp={(e) => handleMouse(e, 'up')} onMouseOut={(e) => handleMouse(e, 'out')} />
+      { active === 'cursor' &&
+      <ZoomButtonContainer>
+        <ZoomButton size='25px' onClick={() => zoomIn(canvasRef, canvasScale, setCanvasScale)}>+</ZoomButton>
+        <ZoomButton size='33px' onClick={() => zoomOut(canvasRef, canvasScale, setCanvasScale)}>-</ZoomButton>
+      </ZoomButtonContainer> }
     </Wrapper>
   );
 }
 
 
 const Wrapper = styled.div`
+  position: relative;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
-  display: flex;
-  justify-content: ${(props) => props.size.width > 1560 && "center"};
-  align-items: ${(props) => props.size.height > 820 && "center"};
-  padding: 10px;
-  overflow: scroll;
-`;
-
-const CanvasContainer = styled.div`
-  width: 1500px;
-  height: 720px;
-  margin: 10px;
+  overflow: hidden;
 
   canvas {
     background-color: white;
     box-shadow: 2px 2px 2px 1px #666666;
   }
+`;
+
+const ZoomButtonContainer = styled.div`
+  position: absolute;
+  right: 30px;
+  bottom: 60px;
+  width: 30px;
+  height: 70px;
+  border-radius: 30px;
+  border: 1px solid #DDDDDD;
+  background-color: rgba(255, 255, 255, 0.5);
+`;
+
+const ZoomButton = styled.div`
+  width: 30px;
+  height: 30px;
+  font-size: ${(props) => props.size};
+  line-height: 30px;
+  text-align: center;
+  cursor: pointer;
+
+  &:first-child { margin-bottom: 5px; }
 `;

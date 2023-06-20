@@ -22,7 +22,7 @@ import { filter } from "../hooks/Filter";
 import { undo, redo } from "../hooks/UndoRedo";
 
 
-export default function TopBar({ canvasRef, canvasSize, setCanvasSize, canvasHistory, setCanvasHistory, currentStateIndex, setCurrentStateIndex,
+export default function TopBar({ canvasRef, canvasScale, setCanvasScale, canvasHistory, setCanvasHistory, currentStateIndex, setCurrentStateIndex,
                                  active, setActive, cropRatio, setCropRatio, pencilColor, setPencilColor, textContent, setTextContent, textColor, setTextColor }) {
     const [detailTopBar, setDetailTopBar] = useState('cursor');
 
@@ -37,6 +37,13 @@ export default function TopBar({ canvasRef, canvasSize, setCanvasSize, canvasHis
     if (active === 'cursor') setDetailTopBar('cursor');
   }, [active])
 
+  const save = (e, props) => {
+    if (props === 'click' || (props === 'key' && e.ctrlKey && e.key === 's')) {
+      saveFile(canvasRef);
+      saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
+    }
+  }
+
   const handleRotation = (angle) => {
     rotation(canvasRef, angle);
     saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
@@ -48,11 +55,10 @@ export default function TopBar({ canvasRef, canvasSize, setCanvasSize, canvasHis
   }
 
   const handleUndoRedo = (props) => {
-    if (props === 'undo' && currentStateIndex > 0) {
+    if (props === 'undo' && currentStateIndex > 0)
       undo(canvasRef, canvasHistory, currentStateIndex, setCurrentStateIndex);
-    } else if (currentStateIndex < canvasHistory.length - 1) {
+    else if (currentStateIndex < canvasHistory.length - 1)
       redo(canvasRef, canvasHistory, currentStateIndex, setCurrentStateIndex);
-    }
   }
 
 
@@ -63,7 +69,7 @@ export default function TopBar({ canvasRef, canvasSize, setCanvasSize, canvasHis
         <label htmlFor="image-upload"><ImageIcon /></label>
         <input id="image-upload" type="file" accept="image/*" style={{ display: 'none' }}
           onChange={(e) => { inputImage(e, canvasRef); saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex); }} />
-        <DownloadIcon onClick={() => { saveFile(canvasRef); saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex); }} />
+        <DownloadIcon onClick={(e) => save(e, 'click')} onKeyDown={(e) => save(e, 'key')} />
       </Left>
       <Center>
         <CursorIcon fill={active === 'cursor' ? 'black' : '#777777'} onClick={() => handleClick('cursor')} />
@@ -178,7 +184,7 @@ const DetailBar = styled.div`
   align-items: center;
   width: 100%;
   height: 50px;
-  border-width: 1px 0;
+  border-width: 0 0 1px;
   border-style: solid;
   border-color: #CCCCCC;
   box-sizing: border-box;

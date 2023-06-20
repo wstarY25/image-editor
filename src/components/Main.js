@@ -6,7 +6,7 @@ import Canvas from "./Canvas";
 
 export default function Main() {
   const canvasRef = useRef(null);
-  const [canvasSize, setCanvasSize] = useState({width: 0, height: 0});
+  const [canvasScale, setCanvasScale] = useState(1);
   const [canvasHistory, setCanvasHistory] = useState([]);
   const [currentStateIndex, setCurrentStateIndex] = useState(-1);
   const [active, setActive] = useState('cursor');
@@ -18,7 +18,7 @@ export default function Main() {
   return (
     <Body>
       <Top>
-        <TopBar canvasRef={canvasRef} canvasSize={canvasSize} setCanvasSize={setCanvasSize}
+        <TopBar canvasRef={canvasRef} canvasScale={canvasScale} setCanvasScale={setCanvasScale}
           canvasHistory={canvasHistory} setCanvasHistory={setCanvasHistory}
           currentStateIndex={currentStateIndex} setCurrentStateIndex={setCurrentStateIndex}
           active={active} setActive={setActive}
@@ -27,7 +27,7 @@ export default function Main() {
           textContent={textContent} setTextContent={setTextContent} textColor={textColor} setTextColor={setTextColor} />
       </Top>
       <CanvasContainer>
-        <Canvas canvasRef={canvasRef} canvasSize={canvasSize} setCanvasSize={setCanvasSize}
+        <Canvas canvasRef={canvasRef} canvasScale={canvasScale} setCanvasScale={setCanvasScale}
           canvasHistory={canvasHistory} setCanvasHistory={setCanvasHistory}
           currentStateIndex={currentStateIndex} setCurrentStateIndex={setCurrentStateIndex}
           active={active} setActive={setActive}
@@ -49,6 +49,10 @@ const Body = styled.div`
 const Top = styled.div`
   width: 100%;
   height: 60px;
+  border-width: 0 0 1px;
+  border-style: solid;
+  border-color: #CCCCCC;
+  box-sizing: border-box;
 `;
 
 const CanvasContainer = styled.div`
