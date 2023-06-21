@@ -11,6 +11,7 @@ import { ReactComponent as RotationIcon } from "../images/rotation.svg";
 import { ReactComponent as EffectIcon } from "../images/effect.svg";
 import { ReactComponent as TextIcon } from "../images/text.svg";
 import { ReactComponent as PencilIcon } from "../images/pencil.svg";
+import { ReactComponent as InfoIcon } from "../images/info.svg";
 import { ReactComponent as UndoIcon } from "../images/undo.svg";
 import { ReactComponent as RedoIcon } from "../images/redo.svg";
 
@@ -22,14 +23,21 @@ import { filter } from "../hooks/Filter";
 import { undo, redo } from "../hooks/UndoRedo";
 
 
-export default function TopBar({ canvasRef, canvasScale, setCanvasScale, canvasHistory, setCanvasHistory, currentStateIndex, setCurrentStateIndex,
+export default function TopBar({ setInfo, canvasRef, canvasHistory, setCanvasHistory, currentStateIndex, setCurrentStateIndex,
                                  active, setActive, cropRatio, setCropRatio, pencilColor, setPencilColor, textContent, setTextContent, textColor, setTextColor }) {
-    const [detailTopBar, setDetailTopBar] = useState('cursor');
+  
+  const [infoText, setInfoText] = useState(false); let infoTime; // 기능 이름
+  const [detailTopBar, setDetailTopBar] = useState('cursor'); // 기능 상세 선택 바
+
+  const handleInfoText = (props) => { // 기능 이름 표시
+    if (props === 'false') { setInfoText(false); clearTimeout(infoTime); }
+    else infoTime = setTimeout(() => { setInfoText(props); }, 2000);
+  }
 
   const handleClick = (props) => {
-    if (props !== 'text' && textContent) setTextContent('');
+    if (props !== 'text' && textContent) setTextContent(''); // 텍스트 내용 비우기
     setActive(props);
-    if (detailTopBar === props) setDetailTopBar('cursor');
+    if (detailTopBar === props) setDetailTopBar('cursor'); // 기능 상세 선택 바 변경
     else setDetailTopBar(props);
   };
 
@@ -37,24 +45,24 @@ export default function TopBar({ canvasRef, canvasScale, setCanvasScale, canvasH
     if (active === 'cursor') setDetailTopBar('cursor');
   }, [active])
 
-  const save = (e, props) => {
+  const save = (e, props) => { // 저장하기
     if (props === 'click' || (props === 'key' && e.ctrlKey && e.key === 's')) {
       saveFile(canvasRef);
       saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
     }
   }
 
-  const handleRotation = (angle) => {
+  const handleRotation = (angle) => { // 회전
     rotation(canvasRef, angle);
     saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
   }
 
-  const handleFilter = (effect) => {
+  const handleFilter = (effect) => { // 필터
     filter(canvasRef, effect);
     saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
   }
 
-  const handleUndoRedo = (props) => {
+  const handleUndoRedo = (props) => { // 되돌리기, 다시 실행
     if (props === 'undo' && currentStateIndex > 0)
       undo(canvasRef, canvasHistory, currentStateIndex, setCurrentStateIndex);
     else if (currentStateIndex < canvasHistory.length - 1)
@@ -65,15 +73,34 @@ export default function TopBar({ canvasRef, canvasScale, setCanvasScale, canvasH
   return (
     <Wrapper>
       <Left>
-        <NewPageIcon onClick={() => {window.location.reload()}} />
-        <label htmlFor="image-upload"><ImageIcon /></label>
-        <input id="image-upload" type="file" accept="image/*" style={{ display: 'none' }}
-          onChange={(e) => { inputImage(e, canvasRef); saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex); }} />
-        <DownloadIcon onClick={(e) => save(e, 'click')} onKeyDown={(e) => save(e, 'key')} />
+        <IconWrap>
+          <NewPageIcon onClick={() => {window.location.reload()}}
+            onMouseEnter={() => handleInfoText('newPage')} onMouseLeave={() => handleInfoText('false')} />
+          { infoText === 'newPage' && <Info>새 페이지 열기</Info> }
+        </IconWrap>
+        <IconWrap>
+          <label htmlFor="image-upload"><ImageIcon onMouseEnter={() => handleInfoText('upload')} onMouseLeave={() => handleInfoText('false')} /></label>
+          <input id="image-upload" type="file" accept="image/*" style={{ display: 'none' }}
+            onChange={(e) => { inputImage(e, canvasRef); saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex); }} />
+          { infoText === 'upload' && <Info>이미지 가져오기</Info> }
+        </IconWrap>
+        <IconWrap>
+          <DownloadIcon onClick={(e) => save(e, 'click')} onKeyDown={(e) => save(e, 'key')}
+            onMouseEnter={() => handleInfoText('download')} onMouseLeave={() => handleInfoText('false')} />
+          { infoText === 'download' && <Info>저장하기</Info> }
+        </IconWrap>
       </Left>
       <Center>
-        <CursorIcon fill={active === 'cursor' ? 'black' : '#777777'} onClick={() => handleClick('cursor')} />
-        <CropIcon fill={active === 'crop' ? 'black' : '#777777'} onClick={() => handleClick('crop')} />
+        <IconWrap>
+          <CursorIcon fill={active === 'cursor' ? 'black' : '#777777'} onClick={() => handleClick('cursor')}
+            onMouseEnter={() => handleInfoText('cursor')} onMouseLeave={() => handleInfoText('false')} />
+          { infoText === 'cursor' && <Info>커서</Info> }
+        </IconWrap>
+        <IconWrap>
+          <CropIcon fill={active === 'crop' ? 'black' : '#777777'} onClick={() => handleClick('crop')}
+            onMouseEnter={() => handleInfoText('crop')} onMouseLeave={() => handleInfoText('false')} />
+          { infoText === 'crop' && <Info>자르기</Info> }
+        </IconWrap>
         { detailTopBar === 'crop' && 
         <DetailBar>
           <Detail font={cropRatio === 0 ? "bold" : ""} onClick={() => setCropRatio(0)}>custom</Detail>
@@ -82,7 +109,11 @@ export default function TopBar({ canvasRef, canvasScale, setCanvasScale, canvasH
           <Detail font={cropRatio === 4/3 ? "bold" : ""} onClick={() => setCropRatio(4/3)}>4 : 3</Detail>
           <Detail font={cropRatio === 16/9 ? "bold" : ""} onClick={() => setCropRatio(16/9)}>16 : 9</Detail>
         </DetailBar> }
-        <RotationIcon fill={active === 'rotation' ? 'black' : '#777777'} onClick={() => handleClick('rotation')} />
+        <IconWrap>
+        <RotationIcon fill={active === 'rotation' ? 'black' : '#777777'} onClick={() => handleClick('rotation')}
+          onMouseEnter={() => handleInfoText('rotation')} onMouseLeave={() => handleInfoText('false')} />
+          { infoText === 'rotation' && <Info>회전</Info> }
+        </IconWrap>
         { detailTopBar === 'rotation' && 
         <DetailBar>
           <Detail onClick={() => handleRotation(-180)}>-180°</Detail>
@@ -90,7 +121,11 @@ export default function TopBar({ canvasRef, canvasScale, setCanvasScale, canvasH
           <Detail onClick={() => handleRotation(90)}>90°</Detail>
           <Detail onClick={() => handleRotation(180)}>180°</Detail>
         </DetailBar> }
-        <EffectIcon fill={active === 'effect' ? 'black' : '#777777'}  onClick={() => handleClick('effect')} />
+        <IconWrap>
+          <EffectIcon fill={active === 'effect' ? 'black' : '#777777'}  onClick={() => handleClick('effect')}
+            onMouseEnter={() => handleInfoText('effect')} onMouseLeave={() => handleInfoText('false')} />
+          { infoText === 'effect' && <Info>필터</Info> }
+        </IconWrap>
         { detailTopBar === 'effect' && 
         <DetailBar>
           <Detail onClick={() => handleFilter('blur(5px)')}>흐림</Detail>
@@ -98,7 +133,11 @@ export default function TopBar({ canvasRef, canvasScale, setCanvasScale, canvasH
           <Detail onClick={() => handleFilter('sepia(100%)')}>세피아</Detail>
           <Detail onClick={() => handleFilter('invert(100%)')}>반전</Detail>
         </DetailBar> }
-        <TextIcon fill={active === 'text' ? 'black' : '#777777'}  onClick={() => handleClick('text')} />
+        <IconWrap>
+          <TextIcon fill={active === 'text' ? 'black' : '#777777'}  onClick={() => handleClick('text')}
+            onMouseEnter={() => handleInfoText('text')} onMouseLeave={() => handleInfoText('false')} />
+          { infoText === 'text' && <Info>텍스트 추가</Info> }
+        </IconWrap>
         { detailTopBar === 'text' && 
         <DetailBar>
           <Detail>
@@ -107,17 +146,31 @@ export default function TopBar({ canvasRef, canvasScale, setCanvasScale, canvasH
           </Detail>
           <TextColorPicker><ChromePicker color={textColor} onChange={(color) => setTextColor(color.hex)} /></TextColorPicker>
         </DetailBar> }
-        <PencilIcon fill={active === 'pencil' ? 'black' : '#777777'}  onClick={() => handleClick('pencil')} />
+        <IconWrap>
+          <PencilIcon fill={active === 'pencil' ? 'black' : '#777777'}  onClick={() => handleClick('pencil')}
+            onMouseEnter={() => handleInfoText('pencil')} onMouseLeave={() => handleInfoText('false')} />
+          { infoText === 'pencil' && <Info>그리기</Info> }
+        </IconWrap>
         { detailTopBar === 'pencil' && 
         <PencilColorPicker><ChromePicker color={pencilColor} onChange={(color) => setPencilColor(color.hex)} /></PencilColorPicker> }
       </Center>
       <Right>
-        { currentStateIndex > 0 ?
-          <UndoIcon onClick={() => handleUndoRedo('undo')} />
-        : <UndoIcon fill="#DDDDDD" /> }
-        { currentStateIndex < canvasHistory.length - 1 ?
-          <RedoIcon onClick={() => handleUndoRedo('redo')} />
-        : <RedoIcon fill="#DDDDDD" /> }
+        <IconWrap>
+          { currentStateIndex > 0 ?
+            <UndoIcon onClick={() => handleUndoRedo('undo')} onMouseEnter={() => handleInfoText('undo')} onMouseLeave={() => handleInfoText('false')} />
+          : <UndoIcon fill="#DDDDDD" onMouseEnter={() => handleInfoText('undo')} onMouseLeave={() => handleInfoText('false')} /> }
+          { infoText === 'undo' && <Info>되돌리기</Info> }
+        </IconWrap>
+        <IconWrap>
+          { currentStateIndex < canvasHistory.length - 1 ?
+            <RedoIcon onClick={() => handleUndoRedo('redo')} onMouseEnter={() => handleInfoText('redo')} onMouseLeave={() => handleInfoText('false')} />
+          : <RedoIcon fill="#DDDDDD" onMouseEnter={() => handleInfoText('redo')} onMouseLeave={() => handleInfoText('false')} /> }
+          { infoText === 'redo' && <Info>다시 실행</Info> }
+        </IconWrap>
+        <IconWrap>
+          <InfoIcon onClick={() => setInfo(true)} onMouseEnter={() => handleInfoText('info')} onMouseLeave={() => handleInfoText('false')} />
+          { infoText === 'info' && <Info>도움말</Info> }
+        </IconWrap>
       </Right>
     </Wrapper>
   );
@@ -172,6 +225,19 @@ const Right = styled.div`
     cursor: pointer;
     :hover { fill: #000000; }
   }
+`;
+
+const IconWrap = styled.div`
+  position: relative;
+`;
+
+const Info = styled.div`
+  position: absolute;
+  top: 40px;
+  background-color: #EEEEEE;
+  white-space: nowrap;
+  padding: 2px 5px;
+  z-index: 1;
 `;
 
 // detail-topbar

@@ -9,14 +9,13 @@ import { startDrag, handleDrag, cropAction } from "../hooks/Crop";
 import { textbox } from "../hooks/Textbox";
 
 
-export default function Canvas({ canvasRef, canvasScale, setCanvasScale, canvasHistory, setCanvasHistory, currentStateIndex, setCurrentStateIndex,
-                                 active, setActive, cropRatio, setCropRatio, pencilColor, setPencilColor, textContent, setTextContent, textColor, setTextColor }) {
+export default function Canvas({ canvasRef, canvasScale, setCanvasScale, setCanvasHistory, currentStateIndex, setCurrentStateIndex,
+                                 active, setActive, cropRatio, pencilColor, textContent, textColor }) {
   const canvasContainerRef = useRef(null);
-  const [isMoving, setIsMoving] = useState(false);
-  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0});
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+  const [isMoving, setIsMoving] = useState(false); // 캔버스 이동
+  const [isDrawing, setIsDrawing] = useState(false); // 드로잉
+  const [isDragging, setIsDragging] = useState(false); // 자르기
+  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 }); // 드래그 시작 포인트
   
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -33,22 +32,22 @@ export default function Canvas({ canvasRef, canvasScale, setCanvasScale, canvasH
   }, []);
 
   const handleMove = (e, props) => {
-    if (active === 'cursor') {
-      if (props === 'down') moveStart(e, canvasRef, setIsMoving, setMouseOffset, canvasScale);
-      else if (props === 'move') move(e, canvasRef, isMoving, mouseOffset, canvasScale);
+    if (active === 'cursor') { // 커서(이동)
+      if (props === 'down') moveStart(e, canvasRef, setIsMoving, setStartPosition, canvasScale);
+      else if (props === 'move') move(e, canvasRef, isMoving, startPosition, canvasScale);
       else if (props === 'up') moveEnd(setIsMoving);
     }
   }
 
   const handleMouse = (e, props) => {
-    if (active === 'pencil') {
+    if (active === 'pencil') { // 드로잉
       if (props === 'down') startDrawing(e, canvasRef, pencilColor, setIsDrawing);
       else if (props === 'move') draw(e, canvasRef, pencilColor, isDrawing);
       else if (isDrawing) {
         setIsDrawing(false);
         saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
       }
-    } else if (active === 'crop') {
+    } else if (active === 'crop') { // 자르기
       if (props === 'down') startDrag(e, setIsDragging, setStartPosition, canvasRef);
       else if (props === 'move') handleDrag(e, canvasRef, isDragging, startPosition, cropRatio);
       else if (props === 'up') {
@@ -56,7 +55,7 @@ export default function Canvas({ canvasRef, canvasScale, setCanvasScale, canvasH
         saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
         setActive('cursor');
       }
-    } if (active === 'text' && props === 'down') {
+    } if (active === 'text' && props === 'down') { // 텍스트
       textbox(e, canvasRef, textColor, textContent);
       saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
     }
@@ -64,7 +63,7 @@ export default function Canvas({ canvasRef, canvasScale, setCanvasScale, canvasH
 
 
   return (
-    <Wrapper ref={canvasContainerRef}
+    <CanvasContainer ref={canvasContainerRef}
       onMouseDown={(e) => handleMove(e, 'down')} onMouseMove={(e) => handleMove(e, 'move')} onMouseUp={(e) => handleMove(e, 'up')}>
       <canvas id="canvas" ref={canvasRef}
         onMouseDown={(e) => handleMouse(e, 'down')} onMouseMove={(e) => handleMouse(e, 'move')}
@@ -74,12 +73,12 @@ export default function Canvas({ canvasRef, canvasScale, setCanvasScale, canvasH
         <ZoomButton size='25px' onClick={() => zoomIn(canvasRef, canvasScale, setCanvasScale)}>+</ZoomButton>
         <ZoomButton size='33px' onClick={() => zoomOut(canvasRef, canvasScale, setCanvasScale)}>-</ZoomButton>
       </ZoomButtonContainer> }
-    </Wrapper>
+    </CanvasContainer>
   );
 }
 
 
-const Wrapper = styled.div`
+const CanvasContainer = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
