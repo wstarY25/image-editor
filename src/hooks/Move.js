@@ -1,14 +1,14 @@
-const moveStart = (event, canvasRef, setIsMoving, setMouseOffset, canvasScale) => {
+const moveStart = (event, canvasRef, setIsMoving, setStartPosition, canvasScale) => {
   setIsMoving(true);
   const containerRect = canvasRef.current.getBoundingClientRect();
   const offsetX = event.clientX - containerRect.left;
   const offsetY = event.clientY - containerRect.top;
-  setMouseOffset({ x: offsetX, y: offsetY });
+  setStartPosition({ x: offsetX, y: offsetY });
 };
 
-const move = (event, canvasRef, isMoving, mouseOffset, canvasScale) => {
+const move = (event, canvasRef, isMoving, startPosition, canvasScale) => {
   if (isMoving) {
-    canvasRef.current.style.transform = `translate(${(event.clientX - mouseOffset.x) * canvasScale}px, ${(event.clientY - mouseOffset.y - 60) * canvasScale}px) scale(${canvasScale})`;
+    canvasRef.current.style.transform = `translate(${(event.clientX - startPosition.x) * canvasScale}px, ${(event.clientY - startPosition.y - 60) * canvasScale}px) scale(${canvasScale})`;
   };
 };
 
