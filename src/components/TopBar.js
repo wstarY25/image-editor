@@ -11,10 +11,12 @@ import { ReactComponent as RotationIcon } from "../images/rotation.svg";
 import { ReactComponent as EffectIcon } from "../images/effect.svg";
 import { ReactComponent as TextIcon } from "../images/text.svg";
 import { ReactComponent as PencilIcon } from "../images/pencil.svg";
-import { ReactComponent as InfoIcon } from "../images/info.svg";
+import { ReactComponent as LayerIcon } from "../images/layer.svg";
 import { ReactComponent as UndoIcon } from "../images/undo.svg";
 import { ReactComponent as RedoIcon } from "../images/redo.svg";
+import { ReactComponent as InfoIcon } from "../images/info.svg";
 
+import Layer from "./Layer";
 import { saveHistory } from "../hooks/SaveHistory";
 import { inputImage } from "../hooks/InputImage";
 import { saveFile } from "../hooks/SaveFile";
@@ -153,6 +155,12 @@ export default function TopBar({ setInfo, canvasRef, canvasHistory, setCanvasHis
         </IconWrap>
         { detailTopBar === 'pencil' && 
         <PencilColorPicker><ChromePicker color={pencilColor} onChange={(color) => setPencilColor(color.hex)} /></PencilColorPicker> }
+        <IconWrap>
+          <LayerIcon fill={active === 'layer' ? 'black' : '#777777'}  onClick={() => handleClick('layer')}
+            onMouseEnter={() => handleInfoText('layer')} onMouseLeave={() => handleInfoText('false')} />
+          { infoText === 'layer' && <Info>레이어</Info> }
+        </IconWrap>
+        { detailTopBar === 'layer' && <LayerDetail><Layer /></LayerDetail> }
       </Center>
       <Right>
         <IconWrap>
@@ -285,6 +293,13 @@ const TextColorPicker = styled.div`
 `;
 
 const PencilColorPicker = styled.div`
+  position: absolute;
+  top: 60px;
+  right: 0;
+  z-index: 1;
+`;
+
+const LayerDetail = styled.div`
   position: absolute;
   top: 60px;
   right: 0;
