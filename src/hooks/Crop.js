@@ -105,6 +105,10 @@ const cropAction = (event, canvasRef, isDragging, setIsDragging, startPosition, 
     canvas.height = Math.abs(adjustedHeight);
     context.drawImage(newCanvas, 0, 0); // 자른 이미지 그리기
   }
+  
+  const translateX = (window.innerWidth - canvas.width) / 2;
+  const translateY = (window.innerHeight-60 - canvas.height) / 2;
+  canvas.style.transform = `translate(${translateX}px, ${translateY}px)`;
 };
 
 export { startDrag, handleDrag, cropAction };

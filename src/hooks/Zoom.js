@@ -1,15 +1,13 @@
 const zoomIn = (canvasRef, canvasScale, setCanvasScale) => {
-  let translate = '';
-  if (canvasRef.current.style.transform && canvasRef.current.style.transform.startsWith("translate")) translate = canvasRef.current.style.transform.split(" ")[0] + ' ' + canvasRef.current.style.transform.split(" ")[1];
-  canvasRef.current.style.transform = `${translate} scale(${canvasScale + 0.2})`;
-  setCanvasScale(canvasScale + 0.2);
+  const currentTransform = new DOMMatrix(window.getComputedStyle(canvasRef.current).getPropertyValue('transform'));
+  canvasRef.current.style.transform = `translate(${currentTransform.e}px, ${currentTransform.f}px) scale(${canvasScale + 0.1})`;
+  setCanvasScale(canvasScale + 0.1);
 };
 
 const zoomOut = (canvasRef, canvasScale, setCanvasScale) => {
-  let translate = '';
-  if (canvasRef.current.style.transform && canvasRef.current.style.transform.startsWith("translate")) translate = canvasRef.current.style.transform.split(" ")[0] + ' ' + canvasRef.current.style.transform.split(" ")[1];
-  canvasRef.current.style.transform = `${translate} scale(${canvasScale - 0.2})`;
-  setCanvasScale(canvasScale - 0.2);
+  const currentTransform = new DOMMatrix(window.getComputedStyle(canvasRef.current).getPropertyValue('transform'));
+  canvasRef.current.style.transform = `translate(${currentTransform.e}px, ${currentTransform.f}px) scale(${canvasScale - 0.1})`;
+  setCanvasScale(canvasScale - 0.1);
 };
 
 export { zoomIn, zoomOut };
