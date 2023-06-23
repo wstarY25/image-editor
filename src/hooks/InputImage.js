@@ -15,6 +15,9 @@ export const inputImage = (event, canvasRef) => {
 
       // 이미지 그리기
       context.drawImage(image, 0, 0);
+      const translateX = (window.innerWidth - canvas.width) / 2;
+      const translateY = (window.innerHeight-60 - canvas.height) / 2;
+      canvas.style.transform = `translate(${translateX}px, ${translateY}px)`;
     };
 
     image.src = readerEvent.target.result;

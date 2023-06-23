@@ -38,7 +38,7 @@ export default function Main() {
           currentStateIndex={currentStateIndex} setCurrentStateIndex={setCurrentStateIndex}
           active={active} setActive={setActive}
           cropRatio={cropRatio} pencilColor={pencilColor} textContent={textContent} textColor={textColor} />
-        <Name>© 모바일앱개발협동조합</Name>
+        <Name>모바일앱개발협동조합</Name>
       </CanvasContainer>
     </Body>
   );

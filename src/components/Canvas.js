@@ -33,7 +33,7 @@ export default function Canvas({ canvasRef, canvasScale, setCanvasScale, setCanv
 
   const handleMove = (e, props) => {
     if (active === 'cursor') { // 커서(이동)
-      if (props === 'down') moveStart(e, canvasRef, setIsMoving, setStartPosition, canvasScale);
+      if (props === 'down') moveStart(e, canvasRef, setIsMoving, setStartPosition);
       else if (props === 'move') move(e, canvasRef, isMoving, startPosition, canvasScale);
       else if (props === 'up') moveEnd(setIsMoving);
     }
@@ -42,7 +42,7 @@ export default function Canvas({ canvasRef, canvasScale, setCanvasScale, setCanv
   const handleMouse = (e, props) => {
     if (active === 'pencil') { // 드로잉
       if (props === 'down') startDrawing(e, canvasRef, pencilColor, setIsDrawing);
-      else if (props === 'move') draw(e, canvasRef, pencilColor, isDrawing);
+      else if (props === 'move') draw(e, canvasRef, pencilColor, isDrawing, canvasScale);
       else if (isDrawing) {
         setIsDrawing(false);
         saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
@@ -56,7 +56,7 @@ export default function Canvas({ canvasRef, canvasScale, setCanvasScale, setCanv
         setActive('cursor');
       }
     } if (active === 'text' && props === 'down') { // 텍스트
-      textbox(e, canvasRef, textColor, textContent);
+      textbox(e, canvasRef, textColor, textContent, canvasScale);
       saveHistory(canvasRef, setCanvasHistory, currentStateIndex, setCurrentStateIndex);
     }
   }
